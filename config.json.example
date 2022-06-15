@@ -1,0 +1,18 @@
+{
+    "port": 8121,
+    "logPath": "sunlight.log",
+    "mysql": {
+        "host": "127.0.0.1",
+        "port": 3306,
+        "username": "<mysql username>",
+        "password": "<mysql password>",
+        "db": "sunlight",
+        "timeout": 5
+    },
+    "redis": {
+        "host": "127.0.0.1",
+        "port": 6379,
+        "password": "<redis password>",
+        "db": 1
+    }
+}
