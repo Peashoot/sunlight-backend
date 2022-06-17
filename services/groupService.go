@@ -19,14 +19,16 @@ func NewGroupService() *UserGroupService {
 }
 
 // CreateNewGroup 创建一个新的群组
-func (groupService *UserGroupService) CreateNewGroup(groupName, opUserCode string, inviteeCodes ...string) (db.UserGroupModel, error) {
+func (groupService *UserGroupService) CreateNewGroup(groupName, groupDesc, opUserCode string, inviteeCodes ...string) (db.UserGroupModel, error) {
 	// 创建群组信息
 	group := db.UserGroupModel{
 		BaseModel: db.BaseModel{
 			Code:      uuid.NewString(),
 			CreatedBy: opUserCode,
 		},
-		Name: groupName,
+		Name:        groupName,
+		Description: groupDesc,
+		OwnerCode:   opUserCode,
 	}
 	memberships := make([]db.GroupMembershipModel, len(inviteeCodes))
 	for index, inviteeCode := range inviteeCodes {
@@ -116,8 +118,8 @@ func (groupService *UserGroupService) InviteUser(groupCode, opUserCode string, i
 	return group, err
 }
 
-// ChangeGroupName 改变群组名称
-func (groupService *UserGroupService) ChangeGroupName(groupCode, newGroupName, opUserCode string) (db.UserGroupModel, error) {
+// ChangeGroupInfo 改变群组信息
+func (groupService *UserGroupService) ChangeGroupInfo(groupCode, newGroupName, newGroupDesc, ownerCode, opUserCode string) (db.UserGroupModel, error) {
 	log.Info("[UserGroupService.ChangeGroupName]", "get group", groupCode, "info")
 	group, err := groupService.GetGroupModelByCode(groupCode)
 	if err != nil {
@@ -126,6 +128,8 @@ func (groupService *UserGroupService) ChangeGroupName(groupCode, newGroupName, o
 	// 修改群组信息
 	log.Info("[UserGroupService.ChangeGroupName]", "modify group", groupCode, "info in db")
 	group.Name = newGroupName
+	group.Description = newGroupDesc
+	group.OwnerCode = ownerCode
 	group.UpdatedBy = opUserCode
 	group.UpdatedAt = time.Now()
 	if err = config.MysqlDB.Save(&group).Error; err != nil {
@@ -139,7 +143,7 @@ func (groupService *UserGroupService) ChangeGroupName(groupCode, newGroupName, o
 }
 
 // ChangeMemberNickname 改变成员昵称
-func (grouService *UserGroupService) ChangeMemberNickname(groupCode, memberCode, newNickname, opUserCode string) (db.GroupMembershipModel, error) {
+func (grouService *UserGroupService) ChangeMemberNickname(groupCode, memberCode, groupAlias, newNickname, opUserCode string) (db.GroupMembershipModel, error) {
 	var membership db.GroupMembershipModel
 	log.Info("[UserGroupService.ChangeMemberNickname]", "get membership", groupCode, memberCode, "from cache")
 	exists, err := utils.RedisExists(utils.GroupMembershipCachePrefix + groupCode)
@@ -152,7 +156,8 @@ func (grouService *UserGroupService) ChangeMemberNickname(groupCode, memberCode,
 			return membership, err
 		}
 	}
-	membership.MemberName = newNickname
+	membership.GroupAlias = groupAlias
+	membership.Nickname = newNickname
 	membership.UpdatedBy = opUserCode
 	membership.UpdatedAt = time.Now()
 	if err = config.MysqlDB.Save(&membership).Error; err != nil {
@@ -229,6 +234,7 @@ func (groupService *UserGroupService) QuitGroup(groupCode, quitedCode, opUserCod
 	if err = config.MysqlDB.Save(&membership).Error; err != nil {
 		return membership, err
 	}
+	// TODO: 如果退出的是群主，那将群主的位置顺延给最早加入群聊的人，如果群聊剩余没有人，直接解散该群聊
 	// 如果缓存中存在，刷新缓存中的值；不存在就不刷新，下次从数据库中取
 	log.Info("[UserGroupService.QuitGroup]", "try to remove membership", groupCode, quitedCode, "from cache")
 	exists, _ = utils.RedisExists(utils.GroupMembershipCachePrefix + groupCode)

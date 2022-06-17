@@ -21,13 +21,13 @@ func NewCategoryController() *CategoryController {
 }
 
 func (controller *CategoryController) Route(app iris.Party) {
-	auth.AuthNeedParty.Post("/auth/category/create", controller.CreateNew)
-	auth.AuthNeedParty.Post("/auth/category/changeName", controller.ChangeName)
-	auth.AuthNeedParty.Post("/auth/category/changeDesc", controller.ChangeDesc)
-	auth.AuthNeedParty.Post("/auth/category/remove", controller.Remove)
+	auth.AuthNeedParty.Post("/category/create", controller.CreateNew)
+	auth.AuthNeedParty.Post("/category/changeName", controller.ChangeName)
+	auth.AuthNeedParty.Post("/category/changeDesc", controller.ChangeDesc)
+	auth.AuthNeedParty.Post("/category/remove", controller.Remove)
 }
 
-// CreateNew 创建新类别 /auth/category/create
+// CreateNew 创建新类别 /category/create
 func (controller *CategoryController) CreateNew(ctx iris.Context) {
 	backDo := responses.NewPackagedRespModel()
 	defer func() {
@@ -58,7 +58,7 @@ func (controller *CategoryController) CreateNew(ctx iris.Context) {
 	backDo.Msg = "成功"
 }
 
-// ChangeName 修改种类名称 /auth/category/changeName
+// ChangeName 修改种类名称 /category/changeName
 func (controller *CategoryController) ChangeName(ctx iris.Context) {
 	backDo := responses.NewPackagedRespModel()
 	defer func() {
@@ -89,7 +89,7 @@ func (controller *CategoryController) ChangeName(ctx iris.Context) {
 	backDo.Msg = "成功"
 }
 
-// ChangeDesc 修改描述 /auth/category/changeDesc
+// ChangeDesc 修改描述 /category/changeDesc
 func (controller *CategoryController) ChangeDesc(ctx iris.Context) {
 	backDo := responses.NewPackagedRespModel()
 	defer func() {
@@ -120,7 +120,7 @@ func (controller *CategoryController) ChangeDesc(ctx iris.Context) {
 	backDo.Msg = "成功"
 }
 
-// Remove 移除 /auth/category/remove
+// Remove 移除 /category/remove
 func (controller *CategoryController) Remove(ctx iris.Context) {
 	backDo := responses.NewPackagedRespModel()
 	defer func() {

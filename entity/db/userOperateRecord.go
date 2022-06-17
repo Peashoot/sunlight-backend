@@ -17,6 +17,7 @@ const (
 	LabelDataType
 	CategoryDataType
 	GroupDataType
+	GroupMemberDataType
 )
 
 // OpActionType 操作类型
