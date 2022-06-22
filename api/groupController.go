@@ -8,6 +8,7 @@ import (
 	"github.com/peashoot/sunlight/entity/do/responses"
 	"github.com/peashoot/sunlight/log"
 	"github.com/peashoot/sunlight/services"
+	"gorm.io/gorm"
 )
 
 type GroupController struct {
@@ -123,7 +124,7 @@ func (controller *GroupController) InviteMember(ctx iris.Context) {
 	backDo.Msg = "成功"
 }
 
-// KickOutMember 将成员踢出群组 /group/kickout
+// KickOutMember 将成员移出群组 /group/kickout
 func (controller *GroupController) KickOutMember(ctx iris.Context) {
 	backDo := responses.NewPackagedRespModel()
 	defer func() {
@@ -142,7 +143,7 @@ func (controller *GroupController) KickOutMember(ctx iris.Context) {
 		return
 	}
 	group, err := controller.groupService.QuitGroup(kickoutDo.Code, kickoutDo.MemberCode, kickoutDo.OperatorCode)
-	if err != nil {
+	if err != nil && err != gorm.ErrRecordNotFound {
 		log.Error("[GroupController.KickOutMember]", "try to quit member", kickoutDo.MemberCode, "into group", kickoutDo.Code, ", appear an exception:", err)
 		backDo.Code = responses.ErrorCode
 		backDo.Msg = "系统异常"
