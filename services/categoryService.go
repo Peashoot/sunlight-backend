@@ -43,7 +43,7 @@ func (categoryService *CategoryService) Create(name, groupCode, opUserCode, desc
 func (categoryService *CategoryService) ChangeName(name, categoryCode, opUserCode string) (db.CategoryModel, error) {
 	var category db.CategoryModel
 	log.Info("[CategoryService.ChangeName]", "update name of category", categoryCode, "in db")
-	if err := config.MysqlDB.Where("code = ?", category).First(&category).Error; err != nil {
+	if err := config.MysqlDB.Where("code = ?", categoryCode).First(&category).Error; err != nil {
 		return category, err
 	}
 	category.Name = name
@@ -62,7 +62,7 @@ func (categoryService *CategoryService) ChangeName(name, categoryCode, opUserCod
 func (categoryService *CategoryService) ChangeDesc(desc, categoryCode, opUserCode string) (db.CategoryModel, error) {
 	var category db.CategoryModel
 	log.Info("[CategoryService.ChangeDesc]", "update description of category", categoryCode, "in db")
-	if err := config.MysqlDB.Where("code = ?", category).First(&category).Error; err != nil {
+	if err := config.MysqlDB.Where("code = ?", categoryCode).First(&category).Error; err != nil {
 		return category, err
 	}
 	category.Description = desc

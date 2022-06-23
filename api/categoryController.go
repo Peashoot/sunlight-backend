@@ -8,6 +8,7 @@ import (
 	"github.com/peashoot/sunlight/entity/do/responses"
 	"github.com/peashoot/sunlight/log"
 	"github.com/peashoot/sunlight/services"
+	"gorm.io/gorm"
 )
 
 type CategoryController struct {
@@ -56,6 +57,9 @@ func (controller *CategoryController) CreateNew(ctx iris.Context) {
 		"user", createDo.OperatorCode, "create a category", category.Code, "info:", category.Name)
 	backDo.Code = responses.OKCode
 	backDo.Msg = "成功"
+	backDo.Data = &responses.CategoryCreateRespModel{
+		Code: category.Code,
+	}
 }
 
 // ChangeName 修改种类名称 /category/changeName
@@ -139,7 +143,7 @@ func (controller *CategoryController) Remove(ctx iris.Context) {
 		return
 	}
 	category, err := controller.categoryService.Remove(removeDo.CategoryCode, removeDo.OperatorCode)
-	if err != nil {
+	if err != nil && err != gorm.ErrRecordNotFound {
 		log.Error("[CategoryController.Remove]", "try to remove category", removeDo.CategoryCode, ", appear an exception:", err)
 		backDo.Code = responses.ErrorCode
 		backDo.Msg = "系统异常"
